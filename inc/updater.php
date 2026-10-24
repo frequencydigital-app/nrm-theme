@@ -1,14 +1,16 @@
 <?php
 /**
- * Theme updates from GitHub releases.
+ * Theme updates from GitHub.
  *
- * Watches github.com/frequencydigital-app/nrm-theme. When a release tag is newer than the
- * installed version, WordPress offers it under Dashboard > Updates like any other theme.
+ * Watches the main branch of github.com/frequencydigital-app/nrm-theme. When the Version in
+ * its style.css is newer than the installed version, WordPress offers the update under
+ * Dashboard > Updates like any other theme. Versions are only bumped when a build is ready.
  */
 
 defined( 'ABSPATH' ) || exit;
 
 define( 'NRM_UPDATE_REPO', 'frequencydigital-app/nrm-theme' );
+define( 'NRM_UPDATE_BRANCH', 'main' );
 
 function nrm_update_remote() {
 	$cached = get_site_transient( 'nrm_theme_release' );
@@ -16,27 +18,17 @@ function nrm_update_remote() {
 		return $cached;
 	}
 	$res = wp_remote_get(
-		'https://api.github.com/repos/' . NRM_UPDATE_REPO . '/releases/latest',
-		array(
-			'timeout' => 8,
-			'headers' => array( 'Accept' => 'application/vnd.github+json', 'User-Agent' => 'nrm-theme/' . NRM_VERSION ),
-		)
+		'https://raw.githubusercontent.com/' . NRM_UPDATE_REPO . '/' . NRM_UPDATE_BRANCH . '/style.css?t=' . time(),
+		array( 'timeout' => 8, 'headers' => array( 'User-Agent' => 'nrm-theme/' . NRM_VERSION ) )
 	);
 	$release = array();
 	if ( ! is_wp_error( $res ) && 200 === wp_remote_retrieve_response_code( $res ) ) {
-		$body = json_decode( wp_remote_retrieve_body( $res ), true );
-		if ( ! empty( $body['tag_name'] ) ) {
+		if ( preg_match( '/^\s*Version:\s*([0-9][0-9a-z.\-]*)/mi', wp_remote_retrieve_body( $res ), $m ) ) {
 			$release = array(
-				'version' => ltrim( $body['tag_name'], 'v' ),
-				'zip'     => $body['zipball_url'],
-				'url'     => $body['html_url'],
-				'notes'   => $body['body'] ?? '',
+				'version' => $m[1],
+				'zip'     => 'https://github.com/' . NRM_UPDATE_REPO . '/archive/refs/heads/' . NRM_UPDATE_BRANCH . '.zip',
+				'url'     => 'https://github.com/' . NRM_UPDATE_REPO,
 			);
-			foreach ( (array) ( $body['assets'] ?? array() ) as $asset ) {
-				if ( 'nrm.zip' === ( $asset['name'] ?? '' ) ) {
-					$release['zip'] = $asset['browser_download_url'];
-				}
-			}
 		}
 	}
 	set_site_transient( 'nrm_theme_release', $release, 6 * HOUR_IN_SECONDS );
@@ -68,7 +60,7 @@ function nrm_update_check( $transient ) {
 add_filter( 'pre_set_site_transient_update_themes', 'nrm_update_check' );
 
 /**
- * GitHub zipballs unpack to "owner-repo-hash/": rename to the theme folder.
+ * GitHub zips unpack to "nrm-theme-main/": rename to the theme folder.
  */
 function nrm_update_source( $source, $remote_source, $upgrader, $hook_extra ) {
 	if ( empty( $hook_extra['theme'] ) || get_template() !== $hook_extra['theme'] ) {
@@ -87,7 +79,7 @@ function nrm_update_source( $source, $remote_source, $upgrader, $hook_extra ) {
 add_filter( 'upgrader_source_selection', 'nrm_update_source', 10, 4 );
 
 /**
- * Clear the cached release after an update or when the user forces a check.
+ * Clear the cached version after an update or when the user forces a check.
  */
 add_action( 'upgrader_process_complete', function () { delete_site_transient( 'nrm_theme_release' ); } );
 add_action( 'load-update-core.php', function () {
