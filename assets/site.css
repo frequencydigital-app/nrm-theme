@@ -323,8 +323,8 @@ section { scroll-margin-top: 90px; }
 .site-footer__legal { font-weight: 800; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #C9D3E3; }
 
 /* Inner pages */
-.page { padding-top: 72px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 32px; max-width: 800px; }
-.page h1 { font-size: clamp(36px, 5vw, 56px); }
+.inner { padding-top: 72px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 32px; max-width: 800px; }
+.inner h1 { font-size: clamp(36px, 5vw, 56px); }
 .prose { display: flex; flex-direction: column; gap: 18px; }
 .prose h2 { font-size: clamp(24px, 3vw, 30px); margin-top: 12px; }
 .prose h3 { margin-top: 8px; }

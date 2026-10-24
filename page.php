@@ -4,7 +4,7 @@
  */
 get_header();
 ?>
-<article class="page wrap">
+<article class="inner wrap">
 	<?php while ( have_posts() ) : the_post(); ?>
 		<header class="section-head">
 			<h1><?php the_title(); ?></h1>

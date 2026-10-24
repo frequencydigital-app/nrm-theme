@@ -4,7 +4,7 @@
  */
 get_header();
 ?>
-<article class="page wrap">
+<article class="inner wrap">
 	<header class="section-head">
 		<span class="label">404</span>
 		<h1>That page isn't here.</h1>

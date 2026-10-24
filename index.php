@@ -4,7 +4,7 @@
  */
 get_header();
 ?>
-<article class="page wrap">
+<article class="inner wrap">
 	<header class="section-head">
 		<h1><?php echo have_posts() ? esc_html( get_the_archive_title() ) : 'Nothing here'; ?></h1>
 	</header>
