@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NRM_VERSION', '1.0.4' );
+define( 'NRM_VERSION', '1.0.5' );
 define( 'NRM_DIR', get_template_directory() );
 define( 'NRM_URI', get_template_directory_uri() );
 
@@ -33,9 +33,8 @@ add_action( 'after_setup_theme', 'nrm_setup' );
  * Fonts, tokens, site styles and a small script.
  */
 function nrm_assets() {
-	$fonts = 'https://fonts.googleapis.com/css2?family=Gabarito:wght@700;900&family=Karla:wght@400;700;800&display=swap';
-	wp_enqueue_style( 'nrm-fonts', $fonts, array(), null );
-	wp_enqueue_style( 'nrm-tokens', NRM_URI . '/assets/nrm-tokens.css', array(), NRM_VERSION );
+	wp_enqueue_style( 'nrm-fonts', NRM_URI . '/assets/fonts/fonts.css', array(), NRM_VERSION );
+	wp_enqueue_style( 'nrm-tokens', NRM_URI . '/assets/nrm-tokens.css', array( 'nrm-fonts' ), NRM_VERSION );
 	wp_enqueue_style( 'nrm-site', NRM_URI . '/assets/site.css', array( 'nrm-tokens' ), NRM_VERSION );
 	wp_enqueue_script( 'nrm-site', NRM_URI . '/assets/site.js', array(), NRM_VERSION, array( 'strategy' => 'defer' ) );
 	wp_dequeue_style( 'wp-block-library' );
@@ -45,16 +44,14 @@ function nrm_assets() {
 add_action( 'wp_enqueue_scripts', 'nrm_assets', 20 );
 
 /**
- * Preconnect for Google Fonts.
+ * Preload the self-hosted fonts so text paints in the web fonts on first render.
  */
-function nrm_preconnect( $urls, $relation ) {
-	if ( 'preconnect' === $relation ) {
-		$urls[] = array( 'href' => 'https://fonts.googleapis.com' );
-		$urls[] = array( 'href' => 'https://fonts.gstatic.com', 'crossorigin' => 'anonymous' );
+function nrm_preload_fonts() {
+	foreach ( array( 'gabarito-latin', 'karla-latin' ) as $f ) {
+		echo '<link rel="preload" as="font" type="font/woff2" crossorigin href="' . esc_url( NRM_URI . '/assets/fonts/' . $f . '.woff2' ) . '">' . "\n";
 	}
-	return $urls;
 }
-add_filter( 'wp_resource_hints', 'nrm_preconnect', 10, 2 );
+add_action( 'wp_head', 'nrm_preload_fonts', 0 );
 
 /**
  * Head: meta description, Open Graph, favicon fallbacks, GA4.
