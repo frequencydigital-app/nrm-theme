@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NRM_VERSION', '1.0.6' );
+define( 'NRM_VERSION', '1.0.7' );
 define( 'NRM_DIR', get_template_directory() );
 define( 'NRM_URI', get_template_directory_uri() );
 
@@ -136,3 +136,24 @@ function nrm_nav_items() {
 function nrm_anchor( $hash ) {
 	return is_front_page() ? $hash : home_url( '/' ) . $hash;
 }
+
+/**
+ * Sitemap: pages only. No posts, taxonomies or users on a one-page corporate site.
+ */
+add_filter( 'wp_sitemaps_add_provider', function ( $provider, $name ) {
+	return in_array( $name, array( 'users', 'taxonomies' ), true ) ? false : $provider;
+}, 10, 2 );
+add_filter( 'wp_sitemaps_post_types', function ( $types ) {
+	unset( $types['post'] );
+	return $types;
+} );
+
+/**
+ * Author archives reveal login names: send them home.
+ */
+add_action( 'template_redirect', function () {
+	if ( is_author() ) {
+		wp_safe_redirect( home_url( '/' ), 301 );
+		exit;
+	}
+} );
