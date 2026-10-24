@@ -31,7 +31,7 @@ function nrm_update_remote() {
 			);
 		}
 	}
-	set_site_transient( 'nrm_theme_release', $release, 6 * HOUR_IN_SECONDS );
+	set_site_transient( 'nrm_theme_release', $release, HOUR_IN_SECONDS );
 	return $release;
 }
 
@@ -79,8 +79,11 @@ function nrm_update_source( $source, $remote_source, $upgrader, $hook_extra ) {
 add_filter( 'upgrader_source_selection', 'nrm_update_source', 10, 4 );
 
 /**
- * Clear the cached version after an update or when the user forces a check.
+ * Clear the cached version whenever WordPress clears its own theme update cache
+ * (Updates > Check again, after an upgrade, wp_clean_update_cache()), so a fresh
+ * check always asks GitHub again.
  */
+add_action( 'delete_site_transient_update_themes', function () { delete_site_transient( 'nrm_theme_release' ); } );
 add_action( 'upgrader_process_complete', function () { delete_site_transient( 'nrm_theme_release' ); } );
 add_action( 'load-update-core.php', function () {
 	if ( isset( $_GET['force-check'] ) ) {
