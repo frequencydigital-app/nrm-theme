@@ -1,0 +1,30 @@
+/* Now Regional Media colour and type tokens. v0.1, October 2026. Sits alongside port-now-tokens.css */
+:root {
+  --nrm-navy: #13294B;          /* Pacific Navy: parent pill, text. Salt on it 13.4:1 */
+  --nrm-navy-hover: #1C3862;
+  --nrm-navy-pressed: #0C1D37;
+  --nrm-salt: #F2F1EC;          /* Salt: page ground, pill text */
+  --nrm-sea-glass: #4FB3A9;     /* Sea Glass: live dot, reversed pill. Navy text only */
+  --nrm-card: #FFFFFF;
+  --nrm-muted: #56627A;
+  --nrm-hairline: #D8D9D6;
+  --nrm-dark-ground: #0C1D37;
+  --nrm-dark-text: #F2F1EC;
+
+  /* Title badges. Each title picks a light badge; NRM checks ink contrast and clashes.
+     Navy and Sea Glass are reserved for the parent. */
+  --now-badge-text: #0C2E3A;
+  --now-badge-port: #FFB020;
+  --now-badge-northern-rivers: #7FC08B;
+  --now-badge-hunter: #F4A0B5;  /* Hunter Rose */
+  --now-badge-coffs: #B9A8F0;   /* Coffs Lilac */
+  /* Metro titles: deep badge, Salt text */
+  --now-badge-metro-text: #F2F1EC;
+  --now-badge-metro-example: #8C2D5E;
+
+  --nrm-font-display: "Gabarito", "Trebuchet MS", sans-serif;
+  --nrm-font-text: "Karla", "Helvetica Neue", Arial, sans-serif;
+  --nrm-radius-pill: 999px;
+  --nrm-tap-min: 44px;
+  --nrm-focus-ring: 0 0 0 3px #4FB3A9;
+}
