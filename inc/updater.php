@@ -88,8 +88,9 @@ add_filter( 'upgrader_source_selection', 'nrm_update_source', 10, 4 );
  */
 add_action( 'delete_site_transient_update_themes', function () { delete_site_transient( 'nrm_theme_release' ); } );
 add_action( 'upgrader_process_complete', function () { delete_site_transient( 'nrm_theme_release' ); } );
+// Priority 1 so this runs before WordPress's own wp_update_themes() on the same hook.
 add_action( 'load-update-core.php', function () {
 	if ( isset( $_GET['force-check'] ) ) {
 		delete_site_transient( 'nrm_theme_release' );
 	}
-} );
+}, 1 );
