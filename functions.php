@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NRM_VERSION', '1.1.2' );
+define( 'NRM_VERSION', '1.1.3' );
 define( 'NRM_DIR', get_template_directory() );
 define( 'NRM_URI', get_template_directory_uri() );
 
@@ -90,7 +90,7 @@ function nrm_head() {
 	if ( ! has_site_icon() ) {
 		$i = NRM_URI . '/assets/icons/';
 		foreach ( array( 16, 32, 48 ) as $s ) {
-			echo '<link rel="icon" type="image/png" sizes="' . $s . 'x' . $s . '" href="' . esc_url( $i . 'icon-' . $s . '.png' ) . '">' . "\n";
+			echo '<link rel="icon" type="image/png" sizes="' . $s . 'x' . $s . '" href="' . esc_url( $i . 'icon-' . $s . '.png?v=' . NRM_VERSION ) . '">' . "\n";
 		}
 		echo '<link rel="apple-touch-icon" sizes="180x180" href="' . esc_url( $i . 'icon-180.png' ) . '">' . "\n";
 		echo '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">' . "\n";
