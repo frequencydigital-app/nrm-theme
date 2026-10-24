@@ -50,7 +50,10 @@ function nrm_update_check( $transient ) {
 		'url'         => $release['url'],
 		'package'     => $release['zip'],
 	);
-	if ( version_compare( $release['version'], NRM_VERSION, '>' ) ) {
+	// Compare with the version WordPress just read from disk, not the constant loaded at
+	// request start: straight after an upgrade the constant is still the old version.
+	$installed = $transient->checked[ $slug ] ?? NRM_VERSION;
+	if ( version_compare( $release['version'], $installed, '>' ) ) {
 		$transient->response[ $slug ] = $item;
 	} else {
 		$transient->no_update[ $slug ] = $item;
