@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NRM_VERSION', '1.0.9' );
+define( 'NRM_VERSION', '1.1.0' );
 define( 'NRM_DIR', get_template_directory() );
 define( 'NRM_URI', get_template_directory_uri() );
 
@@ -33,15 +33,33 @@ add_action( 'after_setup_theme', 'nrm_setup' );
  * Fonts, tokens, site styles and a small script.
  */
 function nrm_assets() {
-	wp_enqueue_style( 'nrm-fonts', NRM_URI . '/assets/fonts/fonts.css', array(), NRM_VERSION );
-	wp_enqueue_style( 'nrm-tokens', NRM_URI . '/assets/nrm-tokens.css', array( 'nrm-fonts' ), NRM_VERSION );
-	wp_enqueue_style( 'nrm-site', NRM_URI . '/assets/site.css', array( 'nrm-tokens' ), NRM_VERSION );
 	wp_enqueue_script( 'nrm-site', NRM_URI . '/assets/site.js', array(), NRM_VERSION, array( 'strategy' => 'defer' ) );
 	wp_dequeue_style( 'wp-block-library' );
 	wp_dequeue_style( 'classic-theme-styles' );
 	wp_dequeue_style( 'global-styles' );
 }
 add_action( 'wp_enqueue_scripts', 'nrm_assets', 20 );
+
+/**
+ * The three stylesheets total about 5 KB, so they are inlined: no render-blocking requests.
+ * Font URLs in fonts.css are relative to that file, so they are rewritten to absolute.
+ */
+function nrm_inline_styles() {
+	$css = '';
+	foreach ( array( 'assets/fonts/fonts.css', 'assets/nrm-tokens.css', 'assets/site.css' ) as $file ) {
+		$path = NRM_DIR . '/' . $file;
+		if ( is_readable( $path ) ) {
+			$css .= file_get_contents( $path ) . "\n";
+		}
+	}
+	$css = str_replace( 'url("gabarito-latin.woff2")', 'url("' . NRM_URI . '/assets/fonts/gabarito-latin.woff2")', $css );
+	$css = str_replace( 'url("karla-latin.woff2")', 'url("' . NRM_URI . '/assets/fonts/karla-latin.woff2")', $css );
+	$css = preg_replace( '#/\*.*?\*/#s', '', $css );
+	$css = preg_replace( '/\s+/', ' ', $css );
+	$css = str_replace( array( ' { ', ' } ', '; ', ': ', ', ' ), array( '{', '}', ';', ':', ',' ), $css );
+	echo '<style id="nrm-css">' . trim( $css ) . '</style>' . "\n";
+}
+add_action( 'wp_head', 'nrm_inline_styles', 2 );
 
 /**
  * Preload the self-hosted fonts so text paints in the web fonts on first render.
