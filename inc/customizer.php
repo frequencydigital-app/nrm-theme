@@ -10,7 +10,7 @@ function nrm_option_defaults() {
 		'meta_description' => "Now Regional Media publishes the Now titles: what's on, where to go and who to call, region by region.",
 		'contact_name'     => 'Mike Breen',
 		'contact_role'     => 'Publisher',
-		'contact_phone'    => '0422 309 774',
+		'contact_phone'    => '',
 		'contact_email'    => 'hello@nowregionalmedia.com.au',
 		'enquiry_to'       => '',
 		'media_kit_url'    => '',
@@ -37,7 +37,7 @@ function nrm_customize( $wp_customize ) {
 	$fields = array(
 		'contact_name'     => array( 'Contact name', 'text' ),
 		'contact_role'     => array( 'Contact role', 'text' ),
-		'contact_phone'    => array( 'Contact phone (as displayed)', 'text' ),
+		'contact_phone'    => array( 'Contact phone (blank = not shown)', 'text' ),
 		'contact_email'    => array( 'Contact email (as displayed)', 'email' ),
 		'enquiry_to'       => array( 'Send enquiry form to (blank = admin email)', 'email' ),
 		'media_kit_url'    => array( 'Media kit URL (blank = buttons open the sales form)', 'url' ),

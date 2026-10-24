@@ -119,8 +119,11 @@ $live_count = count( array_filter( $titles, fn( $t ) => $t['live'] ) );
 		<span class="contact-card__name"><?php echo esc_html( nrm_option( 'contact_name' ) ); ?></span>
 		<span class="contact-card__role"><?php echo esc_html( nrm_option( 'contact_role' ) ); ?></span>
 		<div class="contact-card__links">
-			<?php $phone = nrm_option( 'contact_phone' ); $tel = preg_replace( '/\D+/', '', $phone ); $tel = '+61' . ltrim( $tel, '0' ); ?>
-			<a href="tel:<?php echo esc_attr( $tel ); ?>"><?php echo esc_html( $phone ); ?></a>
+			<?php $phone = trim( (string) nrm_option( 'contact_phone' ) ); ?>
+			<?php if ( $phone ) : ?>
+				<?php $tel = '+61' . ltrim( preg_replace( '/\D+/', '', $phone ), '0' ); ?>
+				<a href="tel:<?php echo esc_attr( $tel ); ?>"><?php echo esc_html( $phone ); ?></a>
+			<?php endif; ?>
 			<a href="mailto:<?php echo esc_attr( nrm_option( 'contact_email' ) ); ?>"><?php echo esc_html( nrm_option( 'contact_email' ) ); ?></a>
 		</div>
 	</div>
