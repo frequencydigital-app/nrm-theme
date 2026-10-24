@@ -156,22 +156,21 @@ function nrm_enquiry_handle() {
 	}
 
 	$to      = nrm_option( 'enquiry_to' ) ?: get_option( 'admin_email' );
-	$subject = '[Now Regional Media] ' . $types[ $data['type'] ] . ' enquiry from ' . $data['name'];
-	$lines   = array(
-		'Type: ' . $types[ $data['type'] ],
-		'Region: ' . $data['region'],
-		'Name: ' . $data['name'],
-		'Business: ' . $data['business'],
-		'Email: ' . $data['email'],
-		'Phone: ' . $data['phone'],
-		'',
-		$data['message'],
-		'',
-		'Lead source: ' . $data['source'],
-		'Saved in WP admin > Enquiries' . ( $id && ! is_wp_error( $id ) ? ' (#' . $id . ')' : '' ),
+	$subject = $types[ $data['type'] ] . ' enquiry from ' . $data['name'] . ( $data['business'] ? ' (' . $data['business'] . ')' : '' );
+	$headers = array(
+		'Reply-To: ' . $data['name'] . ' <' . $data['email'] . '>',
+		'Content-Type: text/html; charset=UTF-8',
 	);
-	$headers = array( 'Reply-To: ' . $data['name'] . ' <' . $data['email'] . '>' );
-	wp_mail( $to, $subject, implode( "\n", $lines ), $headers );
+	$from_name = function () { return 'Now Regional Media'; };
+	$from_addr = function ( $from ) {
+		$site = nrm_option( 'contact_email' );
+		return is_email( $site ) ? $site : $from;
+	};
+	add_filter( 'wp_mail_from_name', $from_name );
+	add_filter( 'wp_mail_from', $from_addr );
+	wp_mail( $to, $subject, nrm_enquiry_email_html( $data, $id, $types ), $headers );
+	remove_filter( 'wp_mail_from_name', $from_name );
+	remove_filter( 'wp_mail_from', $from_addr );
 
 	/**
 	 * Hand the lead to the CRM sync.
@@ -186,6 +185,66 @@ function nrm_enquiry_handle() {
 }
 add_action( 'admin_post_nopriv_nrm_enquiry', 'nrm_enquiry_handle' );
 add_action( 'admin_post_nrm_enquiry', 'nrm_enquiry_handle' );
+
+/**
+ * The notification email. Table layout and inline styles so it renders the same in every client.
+ */
+function nrm_enquiry_email_html( $data, $id, $types ) {
+	$e         = 'esc_html';
+	$type      = $types[ $data['type'] ] ?? 'Enquiry';
+	$admin_url = $id && ! is_wp_error( $id ) ? admin_url( 'post.php?post=' . (int) $id . '&action=edit' ) : admin_url( 'edit.php?post_type=nrm_enquiry' );
+	$reply     = 'mailto:' . rawurlencode( $data['email'] ) . '?subject=' . rawurlencode( 'Re: your enquiry to Now Regional Media' );
+	$rows      = array(
+		'Enquiry'  => $type,
+		'Region'   => $data['region'],
+		'Name'     => $data['name'],
+		'Business' => $data['business'],
+		'Email'    => $data['email'],
+		'Phone'    => $data['phone'],
+	);
+	$font = "font-family: Karla, 'Helvetica Neue', Helvetica, Arial, sans-serif;";
+	$head = "font-family: Gabarito, 'Trebuchet MS', Helvetica, Arial, sans-serif;";
+
+	$h  = '<!DOCTYPE html><html lang="en-AU"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>' . $e( $type ) . ' enquiry</title></head>';
+	$h .= '<body style="margin:0;padding:0;background:#F2F1EC;">';
+	$h .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2F1EC;"><tr><td align="center" style="padding:32px 16px;">';
+	$h .= '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">';
+	// Header.
+	$h .= '<tr><td style="padding:0 0 18px 0;' . $font . '">';
+	$h .= '<span style="display:inline-block;background:#13294B;color:#F2F1EC;border-radius:999px;padding:4px 12px 6px 12px;' . $head . 'font-weight:900;font-size:22px;letter-spacing:-0.04em;line-height:1;vertical-align:middle;">&#9679;&nbsp;Now</span>';
+	$h .= '<span style="display:inline-block;vertical-align:middle;margin-left:8px;color:#13294B;font-weight:800;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;line-height:1.1;">Regional<br>Media</span>';
+	$h .= '</td></tr>';
+	// Card.
+	$h .= '<tr><td style="background:#FFFFFF;padding:28px 28px 8px 28px;' . $font . '">';
+	$h .= '<p style="margin:0 0 6px 0;color:#56627A;font-weight:800;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;">New enquiry</p>';
+	$h .= '<h1 style="margin:0 0 18px 0;color:#13294B;' . $head . 'font-weight:900;font-size:28px;line-height:1.05;letter-spacing:-0.03em;">' . $e( $type ) . ' enquiry from ' . $e( $data['name'] ) . '</h1>';
+	$h .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #D8D9D6;">';
+	foreach ( $rows as $label => $value ) {
+		if ( '' === $value ) {
+			continue;
+		}
+		$cell = $e( $value );
+		if ( 'Email' === $label ) {
+			$cell = '<a href="mailto:' . esc_attr( $value ) . '" style="color:#13294B;">' . $cell . '</a>';
+		} elseif ( 'Phone' === $label ) {
+			$cell = '<a href="tel:' . esc_attr( preg_replace( '/\s+/', '', $value ) ) . '" style="color:#13294B;">' . $cell . '</a>';
+		}
+		$h .= '<tr><td style="padding:10px 12px 10px 0;border-bottom:1px solid #D8D9D6;color:#56627A;font-size:13px;font-weight:700;width:90px;vertical-align:top;">' . $e( $label ) . '</td>';
+		$h .= '<td style="padding:10px 0;border-bottom:1px solid #D8D9D6;color:#13294B;font-size:16px;vertical-align:top;">' . $cell . '</td></tr>';
+	}
+	$h .= '</table>';
+	$h .= '<p style="margin:20px 0 6px 0;color:#56627A;font-weight:800;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;">Message</p>';
+	$h .= '<p style="margin:0 0 24px 0;color:#1F2633;font-size:17px;line-height:1.55;">' . nl2br( $e( $data['message'] ) ) . '</p>';
+	$h .= '<table role="presentation" cellpadding="0" cellspacing="0"><tr>';
+	$h .= '<td style="padding:0 10px 20px 0;"><a href="' . esc_url( $reply ) . '" style="display:inline-block;background:#13294B;color:#F2F1EC;text-decoration:none;border-radius:999px;padding:13px 22px;font-weight:700;font-size:15px;' . $font . '">Reply to ' . $e( $data['name'] ) . '</a></td>';
+	$h .= '<td style="padding:0 0 20px 0;"><a href="' . esc_url( $admin_url ) . '" style="display:inline-block;color:#13294B;text-decoration:none;border-radius:999px;padding:11px 20px;font-weight:700;font-size:15px;border:2px solid #13294B;' . $font . '">Open in admin</a></td>';
+	$h .= '</tr></table>';
+	$h .= '</td></tr>';
+	// Footer.
+	$h .= '<tr><td style="padding:16px 4px 0 4px;' . $font . 'color:#56627A;font-size:12px;line-height:1.5;">Lead source: ' . $e( $data['source'] ) . ( $id && ! is_wp_error( $id ) ? ' &middot; Enquiry #' . (int) $id : '' ) . '<br>Sent by nowregionalmedia.com.au. Replying to this email goes straight to the enquirer.</td></tr>';
+	$h .= '</table></td></tr></table></body></html>';
+	return $h;
+}
 
 /**
  * Show the enquiry in admin.
