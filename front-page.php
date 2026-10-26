@@ -19,10 +19,27 @@ $live_count = count( array_filter( $titles, fn( $t ) => $t['live'] ) );
 	</div>
 	<div class="board" aria-label="The Now titles and their status">
 		<?php foreach ( $titles as $t ) : ?>
-			<div class="board__row">
-				<?php echo nrm_title_lockup( $t, 'var(--nrm-salt)' ); ?>
-				<?php echo nrm_title_status( $t, true ); ?>
-			</div>
+			<?php
+			$linked = $t['live'] && $t['url'];
+			$tag    = $linked ? 'a' : 'div';
+			$style  = '--nrm-ground:' . $t['ground'] . ';--nrm-badge:' . $t['badge'] . ';--nrm-ink:' . $t['ground'];
+			$stack  = str_contains( (string) $t['name'], '|' );
+			?>
+			<<?php echo $tag; ?> class="board__row"<?php echo $linked ? ' href="' . esc_url( $t['url'] ) . '"' : ''; ?> style="<?php echo esc_attr( $style ); ?>">
+				<span class="board__lockup<?php echo $stack ? ' board__lockup--stacked' : ''; ?>" role="img" aria-label="<?php echo esc_attr( $t['label'] ); ?>">
+					<?php if ( $stack ) : list( $top, $bottom ) = array_map( 'trim', explode( '|', $t['name'], 2 ) ); ?>
+						<span class="board__name" aria-hidden="true"><span class="board__line-1"><?php echo esc_html( $top ); ?></span><span><?php echo esc_html( $bottom ); ?></span></span>
+					<?php else : ?>
+						<span class="board__name" aria-hidden="true"><?php echo esc_html( $t['name'] ); ?></span>
+					<?php endif; ?>
+					<span class="board__pill" aria-hidden="true">Now</span>
+				</span>
+				<?php if ( $t['live'] ) : ?>
+					<span class="board__status"><span class="board__dot" aria-hidden="true"></span>Live</span>
+				<?php else : ?>
+					<span class="board__status"><?php echo esc_html( $t['launch'] ); ?></span>
+				<?php endif; ?>
+			</<?php echo $tag; ?>>
 		<?php endforeach; ?>
 	</div>
 </section>

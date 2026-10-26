@@ -33,6 +33,7 @@ function nrm_title_fields() {
 		'name'         => array( 'Region name in the lockup', 'e.g. Port, Hunter, Coffs. For Northern Rivers enter "Northern|Rivers" to stack two lines.' ),
 		'region'       => array( 'Region (shown under the lockup)', 'e.g. Port Macquarie-Hastings' ),
 		'badge'        => array( 'Badge colour (hex)', 'Title colour from the suite, e.g. #FFB020. Never navy or sea glass.' ),
+		'ground'       => array( 'Board ground colour (hex)', 'Dark ground for this title\'s row on the homepage board, e.g. #0C2E3A. Signed off by NRM; never another title\'s ground or the parent navy.' ),
 		'status'       => array( 'Status', 'live or upcoming' ),
 		'launch'       => array( 'Launch month (upcoming only)', 'e.g. November 2026' ),
 		'url'          => array( 'Site URL (live only)', 'https://portnow.com.au' ),
@@ -87,7 +88,7 @@ function nrm_titles_save( $post_id ) {
 			$val = sanitize_textarea_field( $raw );
 		} elseif ( 'url' === $key ) {
 			$val = esc_url_raw( $raw );
-		} elseif ( 'badge' === $key ) {
+		} elseif ( 'badge' === $key || 'ground' === $key ) {
 			$val = sanitize_hex_color( $raw ) ?: '';
 		} elseif ( 'status' === $key ) {
 			$val = 'live' === $raw ? 'live' : 'upcoming';
@@ -152,6 +153,7 @@ function nrm_get_titles() {
 			'name'   => get_post_meta( $p->ID, '_nrm_name', true ) ?: $p->post_title,
 			'region' => get_post_meta( $p->ID, '_nrm_region', true ),
 			'badge'  => get_post_meta( $p->ID, '_nrm_badge', true ) ?: '#F2F1EC',
+			'ground' => get_post_meta( $p->ID, '_nrm_ground', true ) ?: '#1F2633',
 			'live'   => 'live' === get_post_meta( $p->ID, '_nrm_status', true ),
 			'launch' => get_post_meta( $p->ID, '_nrm_launch', true ),
 			'url'    => get_post_meta( $p->ID, '_nrm_url', true ),
@@ -178,10 +180,10 @@ function nrm_seed_titles() {
 		return;
 	}
 	$seed = array(
-		array( 'Port Now', 1, array( 'name' => 'Port', 'region' => 'Port Macquarie-Hastings', 'badge' => '#FFB020', 'status' => 'live', 'launch' => '', 'url' => 'https://portnow.com.au', 'facts' => "5,000+ businesses in Port Pages\nAbout 9,000 social followers" ) ),
-		array( 'Northern Rivers Now', 2, array( 'name' => 'Northern|Rivers', 'region' => 'Northern Rivers', 'badge' => '#7FC08B', 'status' => 'upcoming', 'launch' => 'November 2026', 'url' => 'https://northernriversnow.com.au', 'facts' => '' ) ),
-		array( 'Hunter Now', 3, array( 'name' => 'Hunter', 'region' => 'Hunter', 'badge' => '#F4A0B5', 'status' => 'upcoming', 'launch' => 'November 2026', 'url' => '', 'facts' => '' ) ),
-		array( 'Coffs Now', 4, array( 'name' => 'Coffs', 'region' => 'Coffs Coast', 'badge' => '#B9A8F0', 'status' => 'upcoming', 'launch' => 'December 2026', 'url' => '', 'facts' => '' ) ),
+		array( 'Port Now', 1, array( 'name' => 'Port', 'ground' => '#0C2E3A', 'region' => 'Port Macquarie-Hastings', 'badge' => '#FFB020', 'status' => 'live', 'launch' => '', 'url' => 'https://portnow.com.au', 'facts' => "5,000+ businesses in Port Pages\nAbout 9,000 social followers" ) ),
+		array( 'Northern Rivers Now', 2, array( 'name' => 'Northern|Rivers', 'ground' => '#3A1A14', 'region' => 'Northern Rivers', 'badge' => '#7FC08B', 'status' => 'upcoming', 'launch' => 'November 2026', 'url' => 'https://northernriversnow.com.au', 'facts' => '' ) ),
+		array( 'Hunter Now', 3, array( 'name' => 'Hunter', 'ground' => '#2F1533', 'region' => 'Hunter', 'badge' => '#F4A0B5', 'status' => 'upcoming', 'launch' => 'November 2026', 'url' => '', 'facts' => '' ) ),
+		array( 'Coffs Now', 4, array( 'name' => 'Coffs', 'ground' => '#1C3318', 'region' => 'Coffs Coast', 'badge' => '#B9A8F0', 'status' => 'upcoming', 'launch' => 'December 2026', 'url' => '', 'facts' => '' ) ),
 	);
 	foreach ( $seed as $s ) {
 		$id = wp_insert_post( array( 'post_type' => 'nrm_title', 'post_title' => $s[0], 'post_status' => 'publish', 'menu_order' => $s[1] ) );
@@ -197,4 +199,26 @@ add_action( 'after_switch_theme', function () {
 	nrm_register_titles();
 	nrm_seed_titles();
 	flush_rewrite_rules();
+} );
+
+/**
+ * One-off: give existing titles their board grounds (October 2026 board brief).
+ * Only fills empty fields, so later edits in the admin are never overwritten.
+ */
+add_action( 'admin_init', function () {
+	if ( get_option( 'nrm_grounds_seeded' ) ) {
+		return;
+	}
+	$grounds = array(
+		'Port Now'            => '#0C2E3A',
+		'Northern Rivers Now' => '#3A1A14',
+		'Hunter Now'          => '#2F1533',
+		'Coffs Now'           => '#1C3318',
+	);
+	foreach ( get_posts( array( 'post_type' => 'nrm_title', 'posts_per_page' => -1, 'post_status' => 'any' ) ) as $p ) {
+		if ( isset( $grounds[ $p->post_title ] ) && ! get_post_meta( $p->ID, '_nrm_ground', true ) ) {
+			update_post_meta( $p->ID, '_nrm_ground', $grounds[ $p->post_title ] );
+		}
+	}
+	update_option( 'nrm_grounds_seeded', 1 );
 } );

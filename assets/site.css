@@ -188,22 +188,46 @@ section { scroll-margin-top: 90px; }
 	align-items: center;
 }
 .hero__copy { display: flex; flex-direction: column; gap: 24px; }
-.board { background: var(--nrm-navy); padding: 12px 32px; display: flex; flex-direction: column; }
+.board { display: flex; flex-direction: column; width: 100%; max-width: 760px; justify-self: end; }
 .board__row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
-	flex-wrap: wrap;
-	padding: 20px 0;
-	border-bottom: 1px solid #2C4466;
+	display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+	gap: 20px; min-height: 150px; padding: 32px 40px;
+	background: var(--nrm-ground); color: #F4F1EA; text-decoration: none;
 }
-.board__row:last-child { border-bottom: 0; }
-.board .lk { font-size: 34px; }
+a.board__row:hover { color: #F4F1EA; }
+a.board__row:focus-visible { outline: 3px solid #F4F1EA; outline-offset: -6px; box-shadow: none; border-radius: 0; }
+.board__lockup { display: flex; align-items: baseline; gap: 7px; }
+.board__lockup--stacked { align-items: center; }
+.board__name {
+	font-family: var(--nrm-font-display); font-weight: 900;
+	font-size: clamp(34px, 5vw, 48px); line-height: 0.95; letter-spacing: -0.045em;
+	color: #F4F1EA; white-space: nowrap;
+}
+.board__lockup--stacked .board__name span { display: block; }
+.board__line-1 { font-size: 0.664em; line-height: 1; }
+.board__pill {
+	position: relative; display: inline-flex; align-items: center; flex: none;
+	padding: 0.1em 0.36em 0.17em 0.64em; border-radius: var(--nrm-radius-pill);
+	background: var(--nrm-badge); color: var(--nrm-ink);
+	font-family: var(--nrm-font-display); font-weight: 900;
+	font-size: clamp(28px, 4.15vw, 40px); line-height: 1; letter-spacing: -0.04em;
+}
+.board__pill::before {
+	content: ""; position: absolute; left: 0.3em; top: 50%;
+	width: 0.2em; height: 0.2em; margin-top: -0.06em; border-radius: 50%;
+	background: var(--nrm-ink);
+}
+.board__status {
+	display: flex; align-items: center; gap: 10px;
+	font-family: var(--nrm-font-text); font-weight: 800; font-size: 14px;
+	letter-spacing: 0.14em; text-transform: uppercase; color: #F4F1EA;
+}
+.board__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--nrm-badge); }
 @media (max-width: 600px) {
 	.hero { padding-top: 48px; padding-bottom: 56px; }
-	.board { padding: 8px 20px; }
-	.board .lk { font-size: 28px; }
+}
+@media (max-width: 480px) {
+	.board__row { padding: 26px 24px; min-height: 120px; }
 }
 
 /* Titles */

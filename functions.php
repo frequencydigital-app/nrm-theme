@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NRM_VERSION', '1.1.3' );
+define( 'NRM_VERSION', '1.2.0' );
 define( 'NRM_DIR', get_template_directory() );
 define( 'NRM_URI', get_template_directory_uri() );
 
