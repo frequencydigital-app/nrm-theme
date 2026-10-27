@@ -14,6 +14,7 @@ function nrm_option_defaults() {
 		'contact_email'    => 'hello@nowregionalmedia.com.au',
 		'enquiry_to'       => '',
 		'media_kit_url'    => '',
+		'client_login_url' => 'https://adserver.nowregionalmedia.com.au/client-login/',
 		'og_image'         => '',
 		'ga4_id'           => '',
 	);
@@ -41,6 +42,7 @@ function nrm_customize( $wp_customize ) {
 		'contact_email'    => array( 'Contact email (as displayed)', 'email' ),
 		'enquiry_to'       => array( 'Send enquiry form to (blank = admin email)', 'email' ),
 		'media_kit_url'    => array( 'Media kit URL (blank = buttons open the sales form)', 'url' ),
+		'client_login_url' => array( 'Client login link in the header (blank = hidden)', 'url' ),
 		'og_image'         => array( 'Open Graph image URL (1200 x 630)', 'url' ),
 		'ga4_id'           => array( 'GA4 measurement ID (G-XXXXXXX)', 'text' ),
 		'meta_description' => array( 'Meta description', 'textarea' ),

@@ -169,6 +169,8 @@ section { scroll-margin-top: 90px; }
 .site-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .site-nav__link { display: inline-flex; align-items: center; min-height: var(--nrm-tap-min); padding: 0 14px; font-weight: 700; font-size: 15px; text-decoration: none; border-radius: var(--nrm-radius-pill); }
 .site-nav__link:hover { text-decoration: underline; }
+.site-nav__login { gap: 6px; margin-left: 4px; font-size: 14px; color: var(--nrm-muted); }
+.site-nav__login:hover { color: var(--nrm-navy); }
 @media (max-width: 600px) {
 	.site-header { position: static; }
 	section { scroll-margin-top: 16px; }
