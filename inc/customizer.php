@@ -14,7 +14,7 @@ function nrm_option_defaults() {
 		'contact_email'    => 'hello@nowregionalmedia.com.au',
 		'enquiry_to'       => '',
 		'media_kit_url'    => '',
-		'client_login_url' => 'https://adserver.nowregionalmedia.com.au/client-login/',
+		'client_login_url' => 'https://ads.nowregionalmedia.com.au/client-login/',
 		'og_image'         => '',
 		'ga4_id'           => '',
 	);
