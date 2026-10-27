@@ -63,6 +63,21 @@ function nrm_update_check( $transient ) {
 add_filter( 'pre_set_site_transient_update_themes', 'nrm_update_check' );
 
 /**
+ * "Check again" on Dashboard > Updates (force-check=1), and installing an update, clear the cached GitHub answer,
+ * so a release pushed in the last hour shows straight away.
+ */
+function nrm_update_force_check() {
+	if ( isset( $_GET['force-check'] ) && current_user_can( 'update_themes' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		delete_site_transient( 'nrm_theme_release' );
+	}
+}
+add_action( 'load-update-core.php', 'nrm_update_force_check' );
+add_action( 'load-themes.php', 'nrm_update_force_check' );
+add_action( 'upgrader_process_complete', static function () {
+	delete_site_transient( 'nrm_theme_release' );
+} );
+
+/**
  * GitHub zips unpack to "nrm-theme-main/": rename to the theme folder.
  */
 function nrm_update_source( $source, $remote_source, $upgrader, $hook_extra ) {
