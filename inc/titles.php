@@ -183,7 +183,7 @@ function nrm_seed_titles() {
 		array( 'Port Now', 1, array( 'name' => 'Port', 'ground' => '#0C2E3A', 'region' => 'Port Macquarie-Hastings', 'badge' => '#FFB020', 'status' => 'live', 'launch' => '', 'url' => 'https://portnow.com.au', 'facts' => "5,000+ businesses in Port Pages\nAbout 9,000 social followers" ) ),
 		array( 'Northern Rivers Now', 2, array( 'name' => 'Northern|Rivers', 'ground' => '#3A1A14', 'region' => 'Northern Rivers', 'badge' => '#7FC08B', 'status' => 'upcoming', 'launch' => 'November 2026', 'url' => 'https://northernriversnow.com.au', 'facts' => '' ) ),
 		array( 'Hunter Now', 3, array( 'name' => 'Hunter', 'ground' => '#2F1533', 'region' => 'Hunter', 'badge' => '#F4A0B5', 'status' => 'upcoming', 'launch' => 'November 2026', 'url' => '', 'facts' => '' ) ),
-		array( 'Coffs Now', 4, array( 'name' => 'Coffs', 'ground' => '#1C3318', 'region' => 'Coffs Coast', 'badge' => '#B9A8F0', 'status' => 'upcoming', 'launch' => 'December 2026', 'url' => '', 'facts' => '' ) ),
+		array( 'Coffs Now', 4, array( 'name' => 'Coffs', 'ground' => '#1C3318', 'region' => 'Coffs Coast', 'badge' => '#A3B3EC', 'status' => 'upcoming', 'launch' => 'November 2026', 'url' => '', 'facts' => '' ) ),
 	);
 	foreach ( $seed as $s ) {
 		$id = wp_insert_post( array( 'post_type' => 'nrm_title', 'post_title' => $s[0], 'post_status' => 'publish', 'menu_order' => $s[1] ) );
