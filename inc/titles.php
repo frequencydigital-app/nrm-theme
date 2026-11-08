@@ -37,7 +37,8 @@ function nrm_title_fields() {
 		'status'       => array( 'Status', 'live or upcoming' ),
 		'launch'       => array( 'Launch month (upcoming only)', 'e.g. November 2026' ),
 		'url'          => array( 'Site URL (live only)', 'https://portnow.com.au' ),
-		'facts'        => array( 'Facts (live only, one per line)', '' ),
+		'facts'        => array( 'Facts (live only, one per line)', 'Live numbers: {listings} and {events} are filled from the site each week, e.g. "{listings} businesses listed" or "{events} events coming up". A line whose number is not available is left off the card.' ),
+		'stats_url'    => array( 'Stats URL (optional)', 'Leave empty: Now sites publish their numbers at the site URL plus /wp-json/now/v1/stats. Only for a site that publishes them somewhere else.' ),
 	);
 }
 
@@ -86,7 +87,7 @@ function nrm_titles_save( $post_id ) {
 		$raw = $_POST[ 'nrm_' . $key ] ?? '';
 		if ( 'facts' === $key ) {
 			$val = sanitize_textarea_field( $raw );
-		} elseif ( 'url' === $key ) {
+		} elseif ( 'url' === $key || 'stats_url' === $key ) {
 			$val = esc_url_raw( $raw );
 		} elseif ( 'badge' === $key || 'ground' === $key ) {
 			$val = sanitize_hex_color( $raw ) ?: '';
@@ -147,6 +148,12 @@ function nrm_get_titles() {
 	$out = array();
 	foreach ( $posts as $p ) {
 		$facts = array_filter( array_map( 'trim', explode( "\n", (string) get_post_meta( $p->ID, '_nrm_facts', true ) ) ) );
+		if ( function_exists( 'nrm_stats_fact' ) ) {
+			$stats = get_post_meta( $p->ID, '_nrm_stats', true );
+			$facts = array_values( array_filter( array_map( function ( $line ) use ( $stats ) {
+				return nrm_stats_fact( $line, $stats );
+			}, $facts ) ) );
+		}
 		$out[] = array(
 			'id'     => $p->ID,
 			'label'  => $p->post_title,
