@@ -52,6 +52,12 @@ function nrm_enquiry_form() {
 	$sent  = isset( $_GET['enquiry'] ) && 'sent' === $_GET['enquiry'];
 	$error = isset( $_GET['enquiry'] ) && 'error' === $_GET['enquiry'];
 	$type  = isset( $_GET['type'] ) && isset( nrm_enquiry_types()[ $_GET['type'] ] ) ? sanitize_key( $_GET['type'] ) : 'advertising';
+	// 1.4.0: a Now site's Advertise page links here with the title and product filled in
+	// (?region=Coffs Now&product=Homepage takeover), for its "Check availability" buttons.
+	$region  = isset( $_GET['region'] ) ? sanitize_text_field( wp_unslash( $_GET['region'] ) ) : '';
+	$region  = isset( nrm_enquiry_regions()[ $region ] ) ? $region : '';
+	$product = isset( $_GET['product'] ) ? mb_substr( sanitize_text_field( wp_unslash( $_GET['product'] ) ), 0, 80 ) : '';
+	$prefill = '' !== $product ? sprintf( 'Please check availability for %1$s%2$s.', $product, '' !== $region ? ' on ' . $region : '' ) . "\n\n" : '';
 	?>
 	<form class="enquiry" id="enquiry" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" novalidate>
 		<input type="hidden" name="action" value="nrm_enquiry">
@@ -78,7 +84,7 @@ function nrm_enquiry_form() {
 				<label for="enq-region">Region of interest</label>
 				<select id="enq-region" name="nrm_region">
 					<?php foreach ( nrm_enquiry_regions() as $k => $l ) : ?>
-						<option value="<?php echo esc_attr( $k ); ?>"><?php echo esc_html( $l ); ?></option>
+						<option value="<?php echo esc_attr( $k ); ?>" <?php selected( $region, $k ); ?>><?php echo esc_html( $l ); ?></option>
 					<?php endforeach; ?>
 				</select>
 			</div>
@@ -100,7 +106,7 @@ function nrm_enquiry_form() {
 			</div>
 			<div class="field field--full">
 				<label for="enq-message">Message <span class="req">required</span></label>
-				<textarea id="enq-message" name="nrm_message" rows="5" required></textarea>
+				<textarea id="enq-message" name="nrm_message" rows="5" required><?php echo esc_textarea( $prefill ); ?></textarea>
 			</div>
 		</div>
 		<button type="submit" class="btn btn--primary">Send enquiry</button>
