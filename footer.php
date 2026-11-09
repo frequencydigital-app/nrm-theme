@@ -12,6 +12,10 @@
 						<a href="<?php echo esc_url( $t['url'] ); ?>"><?php echo esc_html( wp_parse_url( $t['url'], PHP_URL_HOST ) ); ?></a>
 					<?php endif; ?>
 				<?php endforeach; ?>
+				<?php $nrm_terms = get_page_by_path( 'terms' ); // 1.3.1: Terms of Trade, linked from every Now checkout and invoice. ?>
+				<?php if ( $nrm_terms && 'publish' === $nrm_terms->post_status ) : ?>
+					<a href="<?php echo esc_url( get_permalink( $nrm_terms ) ); ?>">Terms</a>
+				<?php endif; ?>
 				<?php $privacy = get_option( 'wp_page_for_privacy_policy' ); ?>
 				<?php if ( $privacy && 'publish' === get_post_status( $privacy ) ) : ?>
 					<a href="<?php echo esc_url( get_permalink( $privacy ) ); ?>">Privacy</a>
