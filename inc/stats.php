@@ -9,6 +9,7 @@
  * The Facts field takes placeholders, so the wording stays editable:
  *   {listings} businesses listed   ->  5,119 businesses listed
  *   {events} events coming up      ->  26 events coming up
+ *   {impressions} Google impressions in the last 28 days -> 38,412 ... (from Search Console, see inc/gsc.php)
  * A line whose placeholder has no value, or a value older than NRM_STATS_MAX_AGE, is left off the card, so a broken
  * or stale number never shows. Lines without placeholders print as typed.
  */
@@ -53,9 +54,26 @@ function nrm_stats_refresh_title( $id ) {
 		$new['error']    = is_wp_error( $res ) ? $res->get_error_message() : ( $code ? 'HTTP ' . $code : 'No response' );
 		$new['error_at'] = time();
 	}
+
+	// Search impressions from Google Search Console (inc/gsc.php), when a property and key are set.
+	$prop = trim( (string) get_post_meta( $id, '_nrm_gsc', true ) );
+	if ( $prop && function_exists( 'nrm_gsc_impressions' ) && nrm_gsc_key() ) {
+		$g = nrm_gsc_impressions( $prop );
+		if ( is_wp_error( $g ) ) {
+			$new['gsc_error']    = $g->get_error_message();
+			$new['gsc_error_at'] = time();
+		} else {
+			$new['impressions'] = $g['impressions'];
+			$new['clicks']      = $g['clicks'];
+			$new['gsc_fetched'] = time();
+			$new['gsc_error']   = '';
+		}
+	}
 	update_post_meta( $id, '_nrm_stats', $new );
 
-	return ( $old['listings'] ?? null ) !== ( $new['listings'] ?? null ) || ( $old['events'] ?? null ) !== ( $new['events'] ?? null );
+	return ( $old['listings'] ?? null ) !== ( $new['listings'] ?? null )
+		|| ( $old['events'] ?? null ) !== ( $new['events'] ?? null )
+		|| ( $old['impressions'] ?? null ) !== ( $new['impressions'] ?? null );
 }
 
 /** Refresh every live title; purge the SiteGround page cache once if anything on the cards changed. */
@@ -104,10 +122,12 @@ function nrm_stats_fact( $line, $stats ) {
 	if ( false === strpos( $line, '{' ) ) {
 		return $line;
 	}
-	$fresh = is_array( $stats ) && ! empty( $stats['fetched'] ) && ( time() - (int) $stats['fetched'] ) <= NRM_STATS_MAX_AGE;
-	$map   = array(
-		'{listings}' => $fresh && isset( $stats['listings'] ) && $stats['listings'] > 0 ? number_format_i18n( (int) $stats['listings'] ) : null,
-		'{events}'   => $fresh && isset( $stats['events'] ) && $stats['events'] > 0 ? number_format_i18n( (int) $stats['events'] ) : null,
+	$fresh  = is_array( $stats ) && ! empty( $stats['fetched'] ) && ( time() - (int) $stats['fetched'] ) <= NRM_STATS_MAX_AGE;
+	$gfresh = is_array( $stats ) && ! empty( $stats['gsc_fetched'] ) && ( time() - (int) $stats['gsc_fetched'] ) <= NRM_STATS_MAX_AGE;
+	$map    = array(
+		'{listings}'    => $fresh && isset( $stats['listings'] ) && $stats['listings'] > 0 ? number_format_i18n( (int) $stats['listings'] ) : null,
+		'{events}'      => $fresh && isset( $stats['events'] ) && $stats['events'] > 0 ? number_format_i18n( (int) $stats['events'] ) : null,
+		'{impressions}' => $gfresh && isset( $stats['impressions'] ) && $stats['impressions'] > 0 ? number_format_i18n( (int) $stats['impressions'] ) : null,
 	);
 	foreach ( $map as $tag => $val ) {
 		if ( false !== strpos( $line, $tag ) ) {
@@ -144,8 +164,15 @@ add_action( 'manage_nrm_title_posts_custom_column', function ( $col, $id ) {
 		echo null === ( $s['events'] ?? null ) ? '' : esc_html( ', ' . number_format_i18n( (int) $s['events'] ) . ' events' );
 		echo '<br><span class="description">' . esc_html( 'Fetched ' . wp_date( 'j M Y, g:ia', (int) $s['fetched'] ) ) . '</span>';
 	}
+	if ( is_array( $s ) && ! empty( $s['gsc_fetched'] ) ) {
+		echo '<br>' . esc_html( number_format_i18n( (int) ( $s['impressions'] ?? 0 ) ) . ' impressions, 28 days' );
+		echo '<br><span class="description">' . esc_html( 'GSC fetched ' . wp_date( 'j M Y, g:ia', (int) $s['gsc_fetched'] ) ) . '</span>';
+	}
 	if ( is_array( $s ) && ! empty( $s['error'] ) ) {
 		echo '<br><span style="color:#b32d2e">' . esc_html( 'Last try failed: ' . $s['error'] ) . '</span>';
+	}
+	if ( is_array( $s ) && ! empty( $s['gsc_error'] ) ) {
+		echo '<br><span style="color:#b32d2e">' . esc_html( 'GSC failed: ' . $s['gsc_error'] ) . '</span>';
 	}
 }, 10, 2 );
 

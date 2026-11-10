@@ -5,12 +5,13 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NRM_VERSION', '1.4.0' );
+define( 'NRM_VERSION', '1.5.0' );
 define( 'NRM_DIR', get_template_directory() );
 define( 'NRM_URI', get_template_directory_uri() );
 
 require NRM_DIR . '/inc/titles.php';
 require NRM_DIR . '/inc/stats.php';
+require NRM_DIR . '/inc/gsc.php';
 require NRM_DIR . '/inc/lockups.php';
 require NRM_DIR . '/inc/enquiry.php';
 require NRM_DIR . '/inc/customizer.php';
