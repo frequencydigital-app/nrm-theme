@@ -154,6 +154,7 @@ section { scroll-margin-top: 90px; }
 	color: var(--nrm-navy);
 }
 .status--upcoming { color: var(--nrm-muted); }
+.status__since { color: var(--nrm-muted); margin-left: 2px; }
 .status--on-dark { color: var(--nrm-salt); }
 .status--upcoming.status--on-dark { color: #C9D3E3; }
 .status__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--nrm-sea-glass); }
@@ -244,7 +245,8 @@ a.board__row:focus-visible { outline: 3px solid #F4F1EA; outline-offset: -6px; b
 .card__lockup { display: flex; align-items: flex-end; min-height: 48px; }
 .card__meta { display: flex; flex-direction: column; gap: 2px; }
 .card__region { font-weight: 700; font-size: 16px; }
-.card__facts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 15px; line-height: 1.45; color: #1F2633; }
+.card__facts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.4; color: var(--nrm-muted); }
+.card__facts strong { color: var(--nrm-navy); font-weight: 800; font-variant-numeric: tabular-nums; }
 .card__link { margin-top: auto; font-weight: 700; font-size: 15px; align-self: flex-start; }
 
 /* Advertise */

@@ -35,7 +35,7 @@ function nrm_title_fields() {
 		'badge'        => array( 'Badge colour (hex)', 'Title colour from the suite, e.g. #FFB020. Never navy or sea glass.' ),
 		'ground'       => array( 'Board ground colour (hex)', 'Dark ground for this title\'s row on the homepage board, e.g. #0C2E3A. Signed off by NRM; never another title\'s ground or the parent navy.' ),
 		'status'       => array( 'Status', 'live or upcoming' ),
-		'launch'       => array( 'Launch month (upcoming only)', 'e.g. November 2026' ),
+		'launch'       => array( 'Launch date', 'Upcoming: shown as "Launching ...", e.g. November 2026. Live: shown as "Live since ...", e.g. 1 November 2026. Leave empty to show just "Live".' ),
 		'url'          => array( 'Site URL (live only)', 'https://portnow.com.au' ),
 		'facts'        => array( 'Facts (live only, one per line)', 'Live numbers: {listings}, {events} and {impressions} are filled each week, e.g. "{listings} businesses listed" or "{impressions} Google impressions in the last 28 days". A line whose number is not available is left off the card.' ),
 		'stats_url'    => array( 'Stats URL (optional)', 'Leave empty: Now sites publish their numbers at the site URL plus /wp-json/now/v1/stats. Only for a site that publishes them somewhere else.' ),

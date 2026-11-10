@@ -60,8 +60,24 @@ function nrm_title_lockup( $t, $ink = 'var(--now-badge-text)' ) {
  */
 function nrm_title_status( $t, $on_dark = false ) {
 	if ( $t['live'] ) {
-		return '<span class="status status--live' . ( $on_dark ? ' status--on-dark' : '' ) . '"><span class="status__dot" aria-hidden="true"></span>Live</span>';
+		$since = ( ! $on_dark && ! empty( $t['launch'] ) ) ? ' <span class="status__since">since ' . esc_html( $t['launch'] ) . '</span>' : '';
+		return '<span class="status status--live' . ( $on_dark ? ' status--on-dark' : '' ) . '"><span class="status__dot" aria-hidden="true"></span>Live' . $since . '</span>';
 	}
 	$prefix = $on_dark ? '' : 'Launching ';
 	return '<span class="status status--upcoming' . ( $on_dark ? ' status--on-dark' : '' ) . '">' . esc_html( $prefix . $t['launch'] ) . '</span>';
+}
+
+/**
+ * One fact line with its first figure emphasised, so the numbers scan on the card.
+ * Only a figure of two or more digits gets the emphasis (a lone "1" in a date stays plain).
+ */
+function nrm_fact_html( $fact ) {
+	$done = false;
+	return preg_replace_callback( '/[0-9][0-9,.]*\+?/', function ( $m ) use ( &$done ) {
+		if ( $done || strlen( preg_replace( '/[^0-9]/', '', $m[0] ) ) < 2 ) {
+			return $m[0];
+		}
+		$done = true;
+		return '<strong>' . $m[0] . '</strong>';
+	}, esc_html( $fact ) );
 }
