@@ -12,6 +12,14 @@ defined( 'ABSPATH' ) || exit;
 define( 'NRM_UPDATE_REPO', 'frequencydigital-app/nrm-theme' );
 define( 'NRM_UPDATE_BRANCH', 'main' );
 
+// "Check again" (update-core.php?force-check=1) also drops our hourly GitHub cache, so a
+// freshly pushed version shows straight away instead of after the transient expires (1.5.6).
+add_action( 'load-update-core.php', function () {
+	if ( isset( $_GET['force-check'] ) ) {
+		delete_site_transient( 'nrm_theme_release' );
+	}
+} );
+
 function nrm_update_remote() {
 	$cached = get_site_transient( 'nrm_theme_release' );
 	if ( false !== $cached ) {
