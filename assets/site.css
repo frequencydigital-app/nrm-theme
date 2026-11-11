@@ -191,11 +191,17 @@ section { scroll-margin-top: 90px; }
 	align-items: center;
 }
 .hero__copy { display: flex; flex-direction: column; gap: 24px; }
-.hero__stats { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 24px 44px; }
-.hero__stats li { display: flex; flex-direction: column; }
-.hero__stats li::before { content: ""; width: 28px; height: 4px; border-radius: 2px; background-color: var(--nrm-sea-glass); margin-bottom: 10px; }
-.hero__stats strong { font-family: var(--nrm-font-display); font-weight: 900; font-size: clamp(26px, 2.6vw, 34px); line-height: 1; color: var(--nrm-navy); font-variant-numeric: tabular-nums; }
-.hero__stats span { margin-top: 6px; font-weight: 800; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--nrm-muted); line-height: 1.5; max-width: 20ch; }
+.hero__stats { margin: 0; padding: 20px 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background-color: var(--nrm-card); border: 1px solid var(--nrm-hairline); border-radius: 16px; }
+.hero__stats li { display: flex; flex-direction: column; padding: 2px 24px; border-left: 1px solid var(--nrm-hairline); }
+.hero__stats li:first-child { border-left: 0; }
+.hero__stats li::before { content: ""; width: 26px; height: 4px; border-radius: 2px; background-color: var(--nrm-sea-glass); margin-bottom: 12px; }
+.hero__stats strong { font-family: var(--nrm-font-display); font-weight: 900; font-size: clamp(24px, 2.4vw, 32px); line-height: 1; color: var(--nrm-navy); font-variant-numeric: tabular-nums; }
+.hero__stats span { margin-top: 8px; font-weight: 800; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--nrm-muted); line-height: 1.6; }
+@media (max-width: 600px) {
+	.hero__stats { grid-template-columns: 1fr; padding: 6px 0; }
+	.hero__stats li { border-left: 0; border-top: 1px solid var(--nrm-hairline); padding: 16px 22px; }
+	.hero__stats li:first-child { border-top: 0; }
+}
 .board { display: flex; flex-direction: column; width: 100%; max-width: 760px; justify-self: end; }
 .board__row {
 	display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
