@@ -191,6 +191,8 @@ section { scroll-margin-top: 90px; }
 	align-items: center;
 }
 .hero__copy { display: flex; flex-direction: column; gap: 24px; }
+.hero__stats { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 16px; line-height: 1.4; color: var(--nrm-muted); }
+.hero__stats strong { color: var(--nrm-navy); font-weight: 800; font-variant-numeric: tabular-nums; }
 .board { display: flex; flex-direction: column; width: 100%; max-width: 760px; justify-self: end; }
 .board__row {
 	display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;

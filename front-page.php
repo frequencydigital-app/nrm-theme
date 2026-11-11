@@ -12,6 +12,20 @@ $live_count = count( array_filter( $titles, fn( $t ) => $t['live'] ) );
 	<div class="hero__copy">
 		<h1 id="hero-heading">Local guides for coastal NSW.</h1>
 		<p class="intro">We publish the Now titles. Each one tells a region what's on, where to go and who to call.</p>
+		<?php $nrm_totals = function_exists( 'nrm_stats_network_totals' ) ? nrm_stats_network_totals() : array(); ?>
+		<?php if ( array_filter( $nrm_totals ) ) : ?>
+			<ul class="hero__stats" aria-label="Across the network">
+				<?php if ( $nrm_totals['listings'] ) : ?>
+					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['listings'] ) ); ?></strong> businesses listed</li>
+				<?php endif; ?>
+				<?php if ( $nrm_totals['events'] ) : ?>
+					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['events'] ) ); ?></strong> events coming up</li>
+				<?php endif; ?>
+				<?php if ( $nrm_totals['impressions'] ) : ?>
+					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['impressions'] ) ); ?></strong> Google Search impressions in the last 28 days</li>
+				<?php endif; ?>
+			</ul>
+		<?php endif; ?>
 		<div class="btn-row">
 			<a class="btn btn--primary btn--lg" href="#advertise">Advertise with us</a>
 			<a class="btn btn--secondary btn--lg" href="#partner">Bring Now to your region</a>

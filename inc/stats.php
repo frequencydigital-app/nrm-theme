@@ -146,6 +146,32 @@ function nrm_stats_fact( $line, $stats ) {
 	return preg_replace( array( '/^1 events\b/', '/^1 businesses\b/', '/^1 listings\b/' ), array( '1 event', '1 business', '1 listing' ), $line );
 }
 
+/**
+ * Network totals across the live titles, summed from each title's stored numbers (1.5.4).
+ * Only fresh values count (same NRM_STATS_MAX_AGE rule as the cards), so a broken feed
+ * shrinks a total rather than freezing it. Zeros mean nothing fresh to show.
+ */
+function nrm_stats_network_totals() {
+	$totals = array( 'listings' => 0, 'events' => 0, 'impressions' => 0 );
+	foreach ( get_posts( array( 'post_type' => 'nrm_title', 'post_status' => 'publish', 'posts_per_page' => -1, 'fields' => 'ids' ) ) as $id ) {
+		if ( 'live' !== get_post_meta( $id, '_nrm_status', true ) ) {
+			continue;
+		}
+		$s = get_post_meta( $id, '_nrm_stats', true );
+		if ( ! is_array( $s ) ) {
+			continue;
+		}
+		if ( ! empty( $s['fetched'] ) && ( time() - (int) $s['fetched'] ) <= NRM_STATS_MAX_AGE ) {
+			$totals['listings'] += max( 0, (int) ( $s['listings'] ?? 0 ) );
+			$totals['events']   += max( 0, (int) ( $s['events'] ?? 0 ) );
+		}
+		if ( ! empty( $s['gsc_fetched'] ) && ( time() - (int) $s['gsc_fetched'] ) <= NRM_STATS_MAX_AGE ) {
+			$totals['impressions'] += max( 0, (int) ( $s['impressions'] ?? 0 ) );
+		}
+	}
+	return $totals;
+}
+
 /* ---------------------------------------------------------------- admin: column and Refresh numbers */
 
 add_filter( 'manage_nrm_title_posts_columns', function ( $cols ) {
