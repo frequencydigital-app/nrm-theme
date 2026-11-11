@@ -16,13 +16,13 @@ $live_count = count( array_filter( $titles, fn( $t ) => $t['live'] ) );
 		<?php if ( array_filter( $nrm_totals ) ) : ?>
 			<ul class="hero__stats" aria-label="Across the network">
 				<?php if ( $nrm_totals['listings'] ) : ?>
-					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['listings'] ) ); ?></strong> businesses listed</li>
+					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['listings'] ) ); ?></strong><span>Businesses listed</span></li>
 				<?php endif; ?>
 				<?php if ( $nrm_totals['events'] ) : ?>
-					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['events'] ) ); ?></strong> events coming up</li>
+					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['events'] ) ); ?></strong><span>Events coming up</span></li>
 				<?php endif; ?>
 				<?php if ( $nrm_totals['impressions'] ) : ?>
-					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['impressions'] ) ); ?></strong> Google Search impressions in the last 28 days</li>
+					<li><strong><?php echo esc_html( number_format_i18n( $nrm_totals['impressions'] ) ); ?></strong><span>Google Search impressions, last 28 days</span></li>
 				<?php endif; ?>
 			</ul>
 		<?php endif; ?>
