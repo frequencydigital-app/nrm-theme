@@ -5,7 +5,7 @@
  * A Google service account (its email added as a Restricted user on each Search Console property) lets the theme read
  * each title's search impressions. The service account's JSON key is pasted once into Titles > Search stats and stored
  * in a non-autoloaded option; it is never printed anywhere. Each title names its property in the "GSC property" field
- * (e.g. sc-domain:portnow.com.au). The weekly stats refresh in inc/stats.php then stores the last 28 days of
+ * (e.g. sc-domain:portnow.com.au). The daily stats refresh in inc/stats.php then stores the last 28 days of
  * impressions on the title, and the {impressions} placeholder in Facts prints it, with the same rule as {listings}:
  * a stale or missing number drops the line from the card rather than showing something wrong.
  *

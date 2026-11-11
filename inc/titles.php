@@ -37,7 +37,7 @@ function nrm_title_fields() {
 		'status'       => array( 'Status', 'live or upcoming' ),
 		'launch'       => array( 'Launch date', 'Upcoming: shown as "Launching ...", e.g. November 2026. Live: shown as "Live since ...", e.g. 1 November 2026. Leave empty to show just "Live".' ),
 		'url'          => array( 'Site URL (live only)', 'https://portnow.com.au' ),
-		'facts'        => array( 'Facts (live only, one per line)', 'Live numbers: {listings}, {events} and {impressions} are filled each week, e.g. "{listings} businesses listed" or "{impressions} Google impressions in the last 28 days". A line whose number is not available is left off the card.' ),
+		'facts'        => array( 'Facts (live only, one per line)', 'Live numbers: {listings}, {events} and {impressions} are filled daily, e.g. "{listings} businesses listed" or "{impressions} Google Search impressions in the last 28 days". A line whose number is not available is left off the card.' ),
 		'stats_url'    => array( 'Stats URL (optional)', 'Leave empty: Now sites publish their numbers at the site URL plus /wp-json/now/v1/stats. Only for a site that publishes them somewhere else.' ),
 		'gsc'          => array( 'GSC property (optional)', 'Search Console property for {impressions}, e.g. sc-domain:portnow.com.au. Needs the service account key under Titles > Search stats, and the service account added as a user on the property.' ),
 	);

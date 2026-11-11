@@ -3,20 +3,20 @@
  * Live numbers on the title cards (1.3.0).
  *
  * Each live title's site publishes GET /wp-json/now/v1/stats (Now theme 0.43.30+): published listings and events on
- * now or coming up, the same two numbers that site's own home page shows. Once a week, and whenever a title is saved
+ * now or coming up, the same two numbers that site's own home page shows. Once a day, and whenever a title is saved
  * or "Refresh numbers" is clicked, this fetches them and keeps the last good values on the title.
  *
  * The Facts field takes placeholders, so the wording stays editable:
  *   {listings} businesses listed   ->  5,119 businesses listed
  *   {events} events coming up      ->  26 events coming up
- *   {impressions} Google impressions in the last 28 days -> 38,412 ... (from Search Console, see inc/gsc.php)
+ *   {impressions} Google Search impressions in the last 28 days -> 38,412 ... (from Search Console, see inc/gsc.php)
  * A line whose placeholder has no value, or a value older than NRM_STATS_MAX_AGE, is left off the card, so a broken
  * or stale number never shows. Lines without placeholders print as typed.
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'NRM_STATS_MAX_AGE', 21 * DAY_IN_SECONDS ); // Three missed weekly refreshes.
+define( 'NRM_STATS_MAX_AGE', 21 * DAY_IN_SECONDS ); // Three weeks of missed daily refreshes before a number is too stale to show.
 
 /** Where a title's numbers come from: the Stats URL field, else the site URL plus the Now route. */
 function nrm_stats_endpoint( $id ) {
@@ -95,10 +95,15 @@ function nrm_stats_purge() {
 	}
 }
 
-/** Weekly schedule (core's 'weekly' recurrence). */
+/** Daily schedule (1.5.3, was weekly). An existing weekly event is replaced on the first visit after the update. */
 add_action( 'init', function () {
-	if ( ! wp_next_scheduled( 'nrm_stats_refresh' ) ) {
-		wp_schedule_event( time() + 60, 'weekly', 'nrm_stats_refresh' );
+	$event = wp_get_scheduled_event( 'nrm_stats_refresh' );
+	if ( $event && 'daily' !== $event->schedule ) {
+		wp_clear_scheduled_hook( 'nrm_stats_refresh' );
+		$event = false;
+	}
+	if ( ! $event ) {
+		wp_schedule_event( time() + 60, 'daily', 'nrm_stats_refresh' );
 	}
 } );
 add_action( 'switch_theme', function () {
