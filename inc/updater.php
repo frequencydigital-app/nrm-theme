@@ -12,16 +12,13 @@ defined( 'ABSPATH' ) || exit;
 define( 'NRM_UPDATE_REPO', 'frequencydigital-app/nrm-theme' );
 define( 'NRM_UPDATE_BRANCH', 'main' );
 
-// "Check again" (update-core.php?force-check=1) also drops our hourly GitHub cache, so a
-// freshly pushed version shows straight away instead of after the transient expires (1.5.6).
-add_action( 'load-update-core.php', function () {
-	if ( isset( $_GET['force-check'] ) ) {
-		delete_site_transient( 'nrm_theme_release' );
-	}
-} );
-
 function nrm_update_remote() {
-	$cached = get_site_transient( 'nrm_theme_release' );
+	// "Check again" (update-core.php?force-check=1) bypasses our hourly GitHub cache, so a freshly
+	// pushed version shows on that same click. Done here, inside the check, because core's own
+	// update hooks run before any hook of ours on that page load (1.5.6 tried a load-update-core.php
+	// delete, which ran after the check and so only helped the NEXT click; 1.5.8 fixes that).
+	$force  = is_admin() && isset( $_GET['force-check'] ) && 'update-core.php' === ( $GLOBALS['pagenow'] ?? '' );
+	$cached = $force ? false : get_site_transient( 'nrm_theme_release' );
 	if ( false !== $cached ) {
 		return $cached;
 	}
