@@ -40,6 +40,8 @@ function nrm_title_fields() {
 		'facts'        => array( 'Facts (live only, one per line)', 'Live numbers: {listings}, {events} and {impressions} are filled daily, e.g. "{listings} businesses listed" or "{impressions} Google Search impressions in the last 28 days". A line whose number is not available is left off the card.' ),
 		'stats_url'    => array( 'Stats URL (optional)', 'Leave empty: Now sites publish their numbers at the site URL plus /wp-json/now/v1/stats. Only for a site that publishes them somewhere else.' ),
 		'gsc'          => array( 'GSC property (optional)', 'Search Console property for {impressions}, e.g. sc-domain:portnow.com.au. Needs the service account key under Titles > Search stats, and the service account added as a user on the property.' ),
+		'link_listings' => array( 'Listings link (optional)', 'Where the {listings} fact links to. Empty: the title URL plus /directory/.' ),
+		'link_events'  => array( 'Events link (optional)', 'Where the {events} fact links to. Empty: the title URL plus /whats-on/.' ),
 	);
 }
 
@@ -88,7 +90,7 @@ function nrm_titles_save( $post_id ) {
 		$raw = $_POST[ 'nrm_' . $key ] ?? '';
 		if ( 'facts' === $key ) {
 			$val = sanitize_textarea_field( $raw );
-		} elseif ( 'url' === $key || 'stats_url' === $key ) {
+		} elseif ( 'url' === $key || 'stats_url' === $key || 'link_listings' === $key || 'link_events' === $key ) {
 			$val = esc_url_raw( $raw );
 		} elseif ( 'badge' === $key || 'ground' === $key ) {
 			$val = sanitize_hex_color( $raw ) ?: '';
@@ -148,13 +150,29 @@ function nrm_get_titles() {
 	);
 	$out = array();
 	foreach ( $posts as $p ) {
+		$url  = get_post_meta( $p->ID, '_nrm_url', true );
+		$base = $url ? trailingslashit( $url ) : '';
+		// A fact built from a live number links through to the page behind it on the title's site.
+		$links = array(
+			'{listings}' => trim( (string) get_post_meta( $p->ID, '_nrm_link_listings', true ) ) ?: ( $base ? $base . 'directory/' : '' ),
+			'{events}'   => trim( (string) get_post_meta( $p->ID, '_nrm_link_events', true ) ) ?: ( $base ? $base . 'whats-on/' : '' ),
+		);
+		$stats = get_post_meta( $p->ID, '_nrm_stats', true );
 		$facts = array_filter( array_map( 'trim', explode( "\n", (string) get_post_meta( $p->ID, '_nrm_facts', true ) ) ) );
-		if ( function_exists( 'nrm_stats_fact' ) ) {
-			$stats = get_post_meta( $p->ID, '_nrm_stats', true );
-			$facts = array_values( array_filter( array_map( function ( $line ) use ( $stats ) {
-				return nrm_stats_fact( $line, $stats );
-			}, $facts ) ) );
-		}
+		$facts = array_values( array_filter( array_map( function ( $line ) use ( $stats, $links ) {
+			$text = function_exists( 'nrm_stats_fact' ) ? nrm_stats_fact( $line, $stats ) : $line;
+			if ( '' === $text ) {
+				return null;
+			}
+			$href = '';
+			foreach ( $links as $tag => $to ) {
+				if ( $to && false !== strpos( $line, $tag ) ) {
+					$href = $to;
+					break;
+				}
+			}
+			return array( 'text' => $text, 'href' => $href );
+		}, $facts ) ) );
 		$out[] = array(
 			'id'     => $p->ID,
 			'label'  => $p->post_title,
@@ -164,7 +182,7 @@ function nrm_get_titles() {
 			'ground' => get_post_meta( $p->ID, '_nrm_ground', true ) ?: '#1F2633',
 			'live'   => 'live' === get_post_meta( $p->ID, '_nrm_status', true ),
 			'launch' => get_post_meta( $p->ID, '_nrm_launch', true ),
-			'url'    => get_post_meta( $p->ID, '_nrm_url', true ),
+			'url'    => $url,
 			'facts'  => $facts,
 			'image'  => get_post_thumbnail_id( $p->ID ),
 		);

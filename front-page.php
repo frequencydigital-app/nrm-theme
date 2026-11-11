@@ -87,7 +87,12 @@ $live_count = count( array_filter( $titles, fn( $t ) => $t['live'] ) );
 								<?php if ( $t['live'] && $t['facts'] ) : ?>
 									<ul class="card__facts">
 										<?php foreach ( $t['facts'] as $fact ) : ?>
-											<li><?php echo nrm_fact_html( $fact ); ?></li>
+											<li>
+												<?php
+												$nrm_fact_inner = nrm_fact_html( $fact['text'] );
+												echo $fact['href'] ? '<a href="' . esc_url( $fact['href'] ) . '">' . $nrm_fact_inner . '</a>' : $nrm_fact_inner;
+												?>
+											</li>
 										<?php endforeach; ?>
 									</ul>
 								<?php endif; ?>
